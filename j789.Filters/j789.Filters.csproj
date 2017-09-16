@@ -3,6 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <RuntimeFrameworkVersion>1.1.2</RuntimeFrameworkVersion>
+    <Authors>Trev</Authors>
+    <Company />
+    <Description>Provides filters and attributes that can be leveraged by services.</Description>
   </PropertyGroup>
 
   <ItemGroup>
