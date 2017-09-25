@@ -20,17 +20,18 @@ namespace j789.Filters
         /// <returns>Returns a task since this is an asynchronous method.</returns>
         public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (!context.ModelState.IsValid)
+            // If the IsValid attribute filter is used for the action, don't use this filter.
+            if (!context.Filters.Any(filter => filter.GetType() == typeof(IsValidAttribute)))
             {
-                // Get error messages specified in the model.
-                var errorMessages = context.ModelState.Where(arg => 
-                    arg.Value.ValidationState == ModelValidationState.Invalid && arg.Value.Errors.Any());
-                var stringBuilder = new StringBuilder("Bad request due to invalid request parameter(s).");
-
-                // Append custom error messages.
-                string finalErrorMessage = errorMessages.Aggregate(stringBuilder, (sb, errorMsg) => 
-                    sb.Append($" {errorMsg}"), sb => sb.ToString());
-                throw new BusinessLogicException(finalErrorMessage);
+                if (!context.ModelState.IsValid)
+                {
+                    // Get members of the model with error messages.
+                    var modelStateEntries = context.ModelState.Select(entry => entry.Value);
+                    var entriesWithMessages = modelStateEntries.Where(entry => 
+                        entry.ValidationState == ModelValidationState.Invalid && 
+                        entry.Errors.Any(error => !string.IsNullOrWhiteSpace(error.ErrorMessage)));
+                    ModelStateHelper.ThrowException(entriesWithMessages);
+                }
             }
             return next();
         }
