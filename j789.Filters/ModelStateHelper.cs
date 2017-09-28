@@ -19,10 +19,10 @@ namespace j789.Filters
         {
             var stringBuilder = new StringBuilder("Bad request due to invalid request parameter(s).");
 
-            // Append error messages.
-            errorsForEntries.Select(entryErrors => 
-                (stringBuilder = entryErrors.Aggregate(stringBuilder, (sb, error) => 
-                sb.Append($" {error.ErrorMessage}"))));
+            // For each invalid property on the model, there can be multiple errors.
+            errorsForEntries.Aggregate(stringBuilder, (sb, entryErrors) => 
+                entryErrors.Aggregate(sb, (nestedSb, error) => 
+                nestedSb.Append($"{ error.ErrorMessage}")));
             throw new BusinessLogicException(stringBuilder.ToString());
         }
     }
