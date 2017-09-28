@@ -14,21 +14,16 @@ namespace j789.Filters
         /// <summary>
         /// Throws a business logic exception when the model state isn't valid.
         /// </summary>
-        /// <param name="invalidEntries">All the invalid members of the model with an error message. 
-        /// If there are none, the default message will be returned.</param>
-        internal static void ThrowException(IEnumerable<ModelStateEntry> invalidEntries)
+        /// <param name="errorsForEntries">Collection of errors for each invalid property from the model.</param>
+        internal static void ThrowException(IEnumerable<ModelErrorCollection> errorsForEntries)
         {
-            string finalErrorMessage = "Bad request due to invalid request parameter(s).";
-            if (invalidEntries.Any())
-            {
-                var stringBuilder = new StringBuilder(finalErrorMessage);
+            var stringBuilder = new StringBuilder("Bad request due to invalid request parameter(s).");
 
-                // Append custom error messages.
-                invalidEntries.Aggregate(stringBuilder, (sb, entry) => 
-                    sb.Append(entry.Errors.Select(error => 
-                    $" {error.ErrorMessage}")), sb => finalErrorMessage = sb.ToString());
-            }
-            throw new BusinessLogicException(finalErrorMessage);
+            // Append error messages.
+            errorsForEntries.Select(entryErrors => 
+                (stringBuilder = entryErrors.Aggregate(stringBuilder, (sb, error) => 
+                sb.Append($" {error.ErrorMessage}"))));
+            throw new BusinessLogicException(stringBuilder.ToString());
         }
     }
 }
