@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,12 +24,10 @@ namespace j789.Filters
             {
                 if (!context.ModelState.IsValid)
                 {
-                    // Get members of the model with error messages.
-                    var modelStateEntries = context.ModelState.Select(entry => entry.Value);
-                    var entriesWithMessages = modelStateEntries.Where(entry => 
-                        entry.ValidationState == ModelValidationState.Invalid && 
-                        entry.Errors.Any(error => !string.IsNullOrWhiteSpace(error.ErrorMessage)));
-                    ModelStateHelper.ThrowException(entriesWithMessages);
+                    // Get members of the model that aren't valid.
+                    var invalidEntries = context.ModelState.Where(entry => 
+                        entry.Value.ValidationState == ModelValidationState.Invalid);
+                    ModelStateHelper.ThrowException(invalidEntries.Select(entry => entry.Value.Errors));
                 }
             }
             return next();

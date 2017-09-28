@@ -36,10 +36,7 @@ namespace j789.Filters
                 modelState.Value.ValidationState == ModelValidationState.Invalid);
             if (modelStateEntries.Any())
             {
-                // Get members of the model with error messages.
-                var entriesWithMessages = modelStateEntries.Where(entry => 
-                    entry.Value.Errors.Any(error => !string.IsNullOrWhiteSpace(error.ErrorMessage)));
-                ModelStateHelper.ThrowException(entriesWithMessages.Select(entry => entry.Value));
+                ModelStateHelper.ThrowException(modelStateEntries.Select(entry => entry.Value.Errors));
             }
             return next();
         }
