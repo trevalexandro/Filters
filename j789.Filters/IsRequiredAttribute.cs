@@ -21,7 +21,7 @@ namespace j789.Filters
 
             // If a reference type, null is the default value. Otherwise, value types have a default constructor.
             var defaultValue = type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type) : null;
-            return value != defaultValue;
+            return !value.Equals(defaultValue);
         }
     }
 }
